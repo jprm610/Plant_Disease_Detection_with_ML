@@ -1,0 +1,85 @@
+import numpy as np
+import pandas as pd
+from pathlib import Path
+import random
+from PIL import Image, ImageEnhance, ImageOps, ImageFilter
+
+class DataAugmentation :
+    def __init__(self, df_path: Path, imgs_path: Path) -> None:
+        self.df = pd.read_csv(df_path)
+        self.imgs_path = imgs_path
+
+    def main(self) :
+        separated_dfs = {
+            "healthy" : self.df[self.df.healthy == 1],
+            "multiple_diseases" : self.df[self.df.multiple_diseases == 1],
+            "rust" : self.df[self.df.rust == 1],
+            "scab" : self.df[self.df.scab == 1]
+        }
+
+        goal_amount = max([len(df) for df in separated_dfs.values()])
+
+        last_index = len(self.df)
+        for col in self.df.columns[1:] :
+            iterations = goal_amount - len(separated_dfs[col])
+            while iterations > 0 :
+                img_id = random.choice(list(separated_dfs[col]['image_id']))
+                with Image.open(f"{self.imgs_path}/{img_id}.jpg") as img :
+                    new_img = self.random_transformation(img)
+                    new_img_id = f"Train_{last_index}"
+                    new_img_path = f"{self.imgs_path}/{new_img_id}.jpg"
+                    new_img.save(new_img_path)
+
+                row = {'image_id': new_img_id, 'healthy': 0, 'multiple_diseases': 0, 'rust': 0, 'scab': 0}
+                row[col] = 1
+                
+                new_row_df = pd.DataFrame([row])
+
+                # Use concat to add the new row to the DataFrame
+                self.df = pd.concat([self.df, new_row_df], ignore_index=True)
+
+                last_index += 1
+                iterations -= 1
+
+        self.df.to_csv("artifacts/new_df.csv")
+        print("Data augmentation done!")
+    
+    def random_transformation(self, image: Image) -> Image :
+        """Apply a single random transformation to an image."""
+        transformations = [
+            lambda x: x.rotate(random.randint(-30, 30), expand=True),  # Rotation
+            ImageOps.mirror,                                          # Horizontal Flip
+            lambda x: ImageEnhance.Contrast(x).enhance(random.uniform(0.5, 1.5)),  # Contrast Adjustment
+            lambda x: x.resize((int(x.width * random.uniform(0.7, 1.3)), int(x.height * random.uniform(0.7, 1.3)))),  # Scaling
+            ImageOps.flip,                                            # Vertical Flip
+            lambda x: ImageEnhance.Brightness(x).enhance(random.uniform(0.5, 1.5)),  # Brightness Adjustment
+            lambda x: ImageEnhance.Color(x).enhance(random.uniform(0.5, 1.5)),  # Color Jitter
+            lambda x: ImageEnhance.Sharpness(x).enhance(random.uniform(0.5, 2.0)),  # Sharpness Enhancement
+            lambda x: self.add_gaussian_noise(x),                          # Gaussian Noise
+            lambda x: self.crop_and_resize(x)                              # Crop and Resize
+        ]
+        # Apply a single random transformation
+        transformation = random.choice(transformations)
+        return transformation(image)
+
+    def add_gaussian_noise(self, image):
+        """Add Gaussian noise to an image."""
+        np_image = np.array(image)
+        row, col, ch = np_image.shape
+        mean = 0
+        sigma = random.uniform(1, 25)
+        gauss = np.random.normal(mean, sigma, (row, col, ch))
+        gauss = gauss.reshape(row, col, ch).astype('uint8')
+        noisy = np_image + gauss
+        return Image.fromarray(np.clip(noisy, 0, 255).astype('uint8'))
+
+    def crop_and_resize(self, image):
+        """Crop the image randomly and resize it back to original dimensions."""
+        original_size = image.size
+        left = random.randint(0, original_size[0] // 4)
+        top = random.randint(0, original_size[1] // 4)
+        right = random.randint(3 * original_size[0] // 4, original_size[0])
+        bottom = random.randint(3 * original_size[1] // 4, original_size[1])
+        image = image.crop((left, top, right, bottom))
+        return image.resize(original_size)
+    

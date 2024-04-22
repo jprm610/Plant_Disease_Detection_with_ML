@@ -4,13 +4,18 @@ from src.dataAugmentation import DataAugmentation
 
 # PARAMETERS
 DOWNLOAD_DATA = False
-DF_PATH = Path("artifacts/train.csv")
-IMGS_PATH = Path("artifacts/images")
+DOWNLOAD_PATH = Path("artifacts/sourceData")
+
+AUGMENT_DATA = True
+SOURCE_PATH = Path("artifacts/sourceData")
+FINAL_PATH = Path("artifacts/workData")
 
 # DOWNLOAD DATA
-download = Download(DOWNLOAD_DATA)
-download.main()
+if DOWNLOAD_DATA :
+    download = Download(DOWNLOAD_PATH)
+    download.main()
 
 # DATA AUGMENTATION
-data_augmentation = DataAugmentation(DF_PATH, IMGS_PATH)
-data_augmentation.main()
+if AUGMENT_DATA :
+    data_augmentation = DataAugmentation(SOURCE_PATH, FINAL_PATH)
+    data_augmentation.main()

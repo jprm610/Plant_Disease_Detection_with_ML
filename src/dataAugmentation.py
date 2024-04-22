@@ -2,14 +2,19 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 import random
-from PIL import Image, ImageEnhance, ImageOps, ImageFilter
+from PIL import Image, ImageEnhance, ImageOps
+import cv2
 
 class DataAugmentation :
-    def __init__(self, df_path: Path, imgs_path: Path) -> None:
-        self.df = pd.read_csv(df_path)
-        self.imgs_path = imgs_path
+    def __init__(self, source_path: Path, final_path: Path) -> None:
+        self.df = pd.read_csv(f"{source_path}/train.csv")
+        self.source_path = source_path
+        self.final_path = final_path
+        self.target_size = (2048, 1365)
 
     def main(self) :
+        self.df = self.Copy_Images(self.source_path, self.final_path)
+
         separated_dfs = {
             "healthy" : self.df[self.df.healthy == 1],
             "multiple_diseases" : self.df[self.df.multiple_diseases == 1],
@@ -24,10 +29,11 @@ class DataAugmentation :
             iterations = goal_amount - len(separated_dfs[col])
             while iterations > 0 :
                 img_id = random.choice(list(separated_dfs[col]['image_id']))
-                with Image.open(f"{self.imgs_path}/{img_id}.jpg") as img :
+                with Image.open(f"{self.final_path}/images/{img_id}.jpg") as img :
                     new_img = self.random_transformation(img)
-                    new_img_id = f"Train_{last_index}"
-                    new_img_path = f"{self.imgs_path}/{new_img_id}.jpg"
+                    new_img = new_img.resize(self.target_size)
+                    new_img_id = f"img_{last_index}"
+                    new_img_path = f"{self.final_path}/images/{new_img_id}.jpg"
                     new_img.save(new_img_path)
 
                 row = {'image_id': new_img_id, 'healthy': 0, 'multiple_diseases': 0, 'rust': 0, 'scab': 0}
@@ -41,13 +47,31 @@ class DataAugmentation :
                 last_index += 1
                 iterations -= 1
 
-        self.df.to_csv("artifacts/new_df.csv")
+        self.df.to_csv(f"{self.final_path}/df.csv")
         print("Data augmentation done!")
+        return
+    
+    def Copy_Images(self, sourcePath: Path, finalPath: Path) :
+        """
+        Only copy train images, which are already labeled, in the new folder,
+        and change base dataframe.
+        """
+
+        new_df = self.df.copy()
+        for i in range(len(self.df)) :
+            new_df.loc[i, 'image_id'] = f"img_{i}"
+            with Image.open(f"{sourcePath}/images/Train_{i}.jpg") as img :
+                if img.size != self.target_size :
+                    img = img.rotate(90)
+                img.save(f"{finalPath}/images/img_{i}.jpg")
+
+        new_df.to_csv(f"{finalPath}/df.csv")
+        print("\tCopied base images!")
+        return new_df
     
     def random_transformation(self, image: Image) -> Image :
         """Apply a single random transformation to an image."""
         transformations = [
-            lambda x: x.rotate(random.randint(-30, 30), expand=True),  # Rotation
             ImageOps.mirror,                                          # Horizontal Flip
             lambda x: ImageEnhance.Contrast(x).enhance(random.uniform(0.5, 1.5)),  # Contrast Adjustment
             lambda x: x.resize((int(x.width * random.uniform(0.7, 1.3)), int(x.height * random.uniform(0.7, 1.3)))),  # Scaling

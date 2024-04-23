@@ -3,7 +3,7 @@ from src.download import Download
 from src.dataAugmentation import DataAugmentation
 
 # PARAMETERS
-DOWNLOAD_DATA = False
+DOWNLOAD_DATA = True
 DOWNLOAD_PATH = Path("artifacts/sourceData")
 
 AUGMENT_DATA = True

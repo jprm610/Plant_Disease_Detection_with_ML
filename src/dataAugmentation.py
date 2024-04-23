@@ -3,7 +3,6 @@ import pandas as pd
 from pathlib import Path
 import random
 from PIL import Image, ImageEnhance, ImageOps
-import cv2
 
 class DataAugmentation :
     def __init__(self, source_path: Path, final_path: Path) -> None:

@@ -12,6 +12,15 @@ class Download :
         import os
         import zipfile
 
+        import os
+
+        # Relative path to a file or directory
+        relative_path = ".kaggle"
+        # Get the absolute path
+        kaggle_path = os.path.abspath(relative_path)
+        # Set the environment variable
+        os.environ['KAGGLE_CONFIG_DIR'] = kaggle_path
+
         os.chdir(download_path)
         os.system("kaggle competitions download -c plant-pathology-2020-fgvc7")
         with zipfile.ZipFile("plant-pathology-2020-fgvc7.zip") as zip :

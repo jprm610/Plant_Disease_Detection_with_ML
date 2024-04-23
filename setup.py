@@ -11,4 +11,6 @@ def create_directory_structure():
         os.makedirs(os.path.join(main_dir, subdir), exist_ok=True)
 
 if __name__ == "__main__":
+    os.system("pip install -r requirements.txt")
+
     create_directory_structure()

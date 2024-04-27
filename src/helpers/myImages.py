@@ -1,7 +1,9 @@
 import cv2
 import numpy as np
 
-class Images :
+class MyImages :
+    MODES = ['RGB', 'YUV', 'HSV', 'LAB', 'HLS', 'XYZ', 'YCRCB', 'CMY', 'YIQ']
+
     @classmethod
     def img_read(cls, filename, color_space='RGB') :
         """

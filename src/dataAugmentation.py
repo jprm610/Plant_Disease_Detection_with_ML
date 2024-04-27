@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from pathlib import Path
-import random
+from random import seed, choice
 from PIL import Image, ImageEnhance, ImageOps
 
 class DataAugmentation :
@@ -27,7 +27,8 @@ class DataAugmentation :
         for col in self.df.columns[1:] :
             iterations = goal_amount - len(separated_dfs[col])
             while iterations > 0 :
-                img_id = random.choice(list(separated_dfs[col]['image_id']))
+                seed(1)
+                img_id = choice(list(separated_dfs[col]['image_id']))
                 with Image.open(f"{self.final_path}/images/{img_id}.jpg") as img :
                     new_img = self.random_transformation(img)
                     new_img = new_img.resize(self.target_size)
@@ -69,6 +70,7 @@ class DataAugmentation :
         return new_df
     
     def random_transformation(self, image: Image) -> Image :
+        import random
         """Apply a single random transformation to an image."""
         transformations = [
             ImageOps.mirror,                                          # Horizontal Flip
@@ -86,6 +88,7 @@ class DataAugmentation :
         return transformation(image)
 
     def add_gaussian_noise(self, image):
+        import random
         """Add Gaussian noise to an image."""
         np_image = np.array(image)
         row, col, ch = np_image.shape
@@ -97,6 +100,7 @@ class DataAugmentation :
         return Image.fromarray(np.clip(noisy, 0, 255).astype('uint8'))
 
     def crop_and_resize(self, image):
+        import random
         """Crop the image randomly and resize it back to original dimensions."""
         original_size = image.size
         left = random.randint(0, original_size[0] // 4)

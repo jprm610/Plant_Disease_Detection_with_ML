@@ -6,7 +6,7 @@ from PIL import Image, ImageEnhance, ImageOps
 
 class DataAugmentation :
     def __init__(self, source_path: Path, final_path: Path) -> None:
-        self.df = pd.read_csv(f"{source_path}/train.csv")
+        self.df = pd.read_csv(source_path / Path("train.csv"))
         self.source_path = source_path
         self.final_path = final_path
         self.target_size = (2048, 1365)

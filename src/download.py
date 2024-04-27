@@ -25,4 +25,5 @@ class Download :
         os.system("kaggle competitions download -c plant-pathology-2020-fgvc7")
         with zipfile.ZipFile("plant-pathology-2020-fgvc7.zip") as zip :
             zip.extractall()
-        os.chdir('../')
+        
+

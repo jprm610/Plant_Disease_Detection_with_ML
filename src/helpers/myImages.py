@@ -133,3 +133,4 @@ class MyImages :
             return new_img
         else :
             raise Exception('INPUT ERROR: Espacio de color incorrecto')
+    

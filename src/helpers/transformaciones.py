@@ -78,3 +78,4 @@ class Transformaciones :
         img = cls.apply_f(img, clahe.apply, [])
         
         return img
+    

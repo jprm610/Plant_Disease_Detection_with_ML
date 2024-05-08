@@ -27,7 +27,7 @@ class DataAugmentation :
         for col in self.df.columns[1:] :
             iterations = goal_amount - len(separated_dfs[col])
             while iterations > 0 :
-                seed(1)
+                seed(iterations)
                 img_id = choice(list(separated_dfs[col]['image_id']))
                 with Image.open(f"{self.final_path}/images/{img_id}.jpg") as img :
                     new_img = self.random_transformation(img)

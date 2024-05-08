@@ -134,3 +134,13 @@ class MyImages :
         else :
             raise Exception('INPUT ERROR: Espacio de color incorrecto')
     
+    @classmethod
+    def threshold_v_channel_inverted(images, threshold=155):
+        thresholded_images = []
+        for img in images:
+            if img is not None:
+                # Aplicar umbralización binaria inversa
+                _, thresh_img = cv2.threshold(img, threshold, 255, cv2.THRESH_BINARY_INV)
+                thresholded_images.append(thresh_img)
+        return thresholded_images
+        

@@ -6,7 +6,7 @@ def create_directory_structure():
     os.makedirs(main_dir, exist_ok=True)
     
     # Create subdirectories
-    subdirectories = ["sourceData", "workData/images"]
+    subdirectories = ["sourceData", "workData/images", "preprocesamiento"]
     for subdir in subdirectories:
         os.makedirs(os.path.join(main_dir, subdir), exist_ok=True)
 

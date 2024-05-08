@@ -3,15 +3,12 @@ from PIL import Image
 import numpy as np
 
 class Preproceso:
-    def __init__(self, source_folder, target_folder='preprocesamiento', threshold=155):
+    def __init__(self, source_folder, target_folder, threshold=155):
         self.source_folder = source_folder
         self.target_folder = target_folder
         self.threshold = threshold
-        if not os.path.exists(target_folder):
-            os.makedirs(target_folder)
-        print(f"Directorio de destino {target_folder} está listo.")
 
-    def process_images(self):
+    def main(self):
         print(f"Procesando imágenes en {self.source_folder}...")
         for filename in os.listdir(self.source_folder):
             if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
@@ -36,9 +33,3 @@ class Preproceso:
             print(f"Imagen guardada en {save_path}")
         except Exception as e:
             print(f"Error al procesar la imagen {filename}: {e}")
-
-# Uso de la clase para el preprocesamiento
-if __name__ == "__main__":
-    preproceso = Preproceso('path_to_your_image_folder', 'path_to_destination_folder')
-    preproceso.process_images()
-

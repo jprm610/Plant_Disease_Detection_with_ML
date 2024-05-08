@@ -5,16 +5,19 @@ import os
 from src.preproceso import Preproceso
 
 # PARAMETERS
+#ROOT_PATH = Path("C:\\Users\\agarc\\OneDrive\\Documentos\\GitHub\\Plant_Disease_Detection_for_ML")
+ROOT_PATH = os.path.abspath("")
+
 DOWNLOAD_DATA = True
 DOWNLOAD_PATH = Path("artifacts/sourceData")
 
 AUGMENT_DATA = True
 SOURCE_PATH = Path("artifacts\\sourceData")
 FINAL_PATH = Path("artifacts\\workData")
-ROOT_PATH = Path("C:\\Users\\agarc\\OneDrive\\Documentos\\GitHub\\Plant_Disease_Detection_for_ML")
-NEW_PATH = Path("artifacts\\preprocesamiento")
-NEDD_PATH=Path("artifacts\\workData\\images")
+
 PREPROCESO = True
+NEDD_PATH=Path("artifacts\\workData\\images")
+NEW_PATH = Path("artifacts\\preprocesamiento")
 
 # DOWNLOAD DATA
 if DOWNLOAD_DATA:
@@ -31,7 +34,7 @@ if AUGMENT_DATA:
 # PREPROCESO
 if PREPROCESO:
     preproceso_n = Preproceso(NEDD_PATH, NEW_PATH, 150)
-    preproceso_n.process_images()
+    preproceso_n.main()
 
 print("Proceso completado.")
 

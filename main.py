@@ -8,15 +8,15 @@ from src.preproceso import Preproceso
 #ROOT_PATH = Path("C:\\Users\\agarc\\OneDrive\\Documentos\\GitHub\\Plant_Disease_Detection_for_ML")
 ROOT_PATH = os.path.abspath("")
 
-DOWNLOAD_DATA = False
+DOWNLOAD_DATA = True
 DOWNLOAD_PATH = Path("artifacts/sourceData")
 
-AUGMENT_DATA = False
+AUGMENT_DATA = True
 SOURCE_PATH = Path("artifacts\\sourceData")
 FINAL_PATH = Path("artifacts\\workData")
 
 PREPROCESO = True
-NEDD_PATH = Path("artifacts\\workData\\images")
+NEDD_PATH=Path("artifacts\\workData\\images")
 NEW_PATH = Path("artifacts\\preprocesamiento")
 
 # DOWNLOAD DATA
@@ -33,8 +33,8 @@ if AUGMENT_DATA:
 
 # PREPROCESO
 if PREPROCESO:
-    preproceso = Preproceso(NEDD_PATH, NEW_PATH, 150)
-    preproceso.main()
+    preproceso_n = Preproceso(NEDD_PATH, NEW_PATH, 150)
+    preproceso_n.main()
 
 print("Proceso completado.")
 

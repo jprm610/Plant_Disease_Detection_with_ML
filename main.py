@@ -1,42 +1,57 @@
+import os
 from pathlib import Path
+from setup import Setup
 from src.download import Download
 from src.dataAugmentation import DataAugmentation
-import os
 from src.preproceso import Preproceso
 
 # PARAMETERS
 #ROOT_PATH = Path("C:\\Users\\agarc\\OneDrive\\Documentos\\GitHub\\Plant_Disease_Detection_for_ML")
 ROOT_PATH = os.path.abspath("")
 
-DOWNLOAD_DATA = True
-DOWNLOAD_PATH = Path("artifacts/sourceData")
+FIRST_RUN = False
 
-AUGMENT_DATA = True
+DOWNLOAD = {
+    "DOWNLOAD_DATA": True,
+    "PARAMETERS": {
+        "github_user": "spMohanty",
+        "github_repo": "PlantVillage-Dataset",
+        "target_repo_folder": Path("raw/color"),
+        "destination": Path("artifacts/data/images"),
+        "labels": ["Apple_scab", "Black_rot", "Cedar_apple_rust", "healthy"]
+    }
+}
+
+AUGMENT_DATA = False
 SOURCE_PATH = Path("artifacts\\sourceData")
 FINAL_PATH = Path("artifacts\\workData")
 
-PREPROCESO = True
+PREPROCESO = False
 NEDD_PATH=Path("artifacts\\workData\\images")
 NEW_PATH = Path("artifacts\\preprocesamiento")
 
-# DOWNLOAD DATA
-if DOWNLOAD_DATA:
-    download = Download(DOWNLOAD_PATH)
-    download.main()
+if __name__ == "__main__" :
+    if FIRST_RUN :
+        Setup().create_directory_structure()
 
-os.chdir(ROOT_PATH)  # Cambia el directorio de trabajo al directorio raíz del proyecto
+    # DOWNLOAD DATA
+    if DOWNLOAD["DOWNLOAD_DATA"] :
+        download = Download(**DOWNLOAD["PARAMETERS"])
+        download.main()
 
-# DATA AUGMENTATION
-if AUGMENT_DATA:
-    data_augmentation = DataAugmentation(SOURCE_PATH, FINAL_PATH)
-    data_augmentation.main()
+    os.chdir(ROOT_PATH)  # Cambia el directorio de trabajo al directorio raíz del proyecto
 
-# PREPROCESO
-if PREPROCESO:
-    preproceso_n = Preproceso(NEDD_PATH, NEW_PATH, 150)
-    preproceso_n.main()
+    # DATA AUGMENTATION
+    if AUGMENT_DATA:
+        data_augmentation = DataAugmentation(SOURCE_PATH, FINAL_PATH)
+        data_augmentation.main()
 
-print("Proceso completado.")
+    # PREPROCESO
+    if PREPROCESO:
+        preproceso_n = Preproceso(NEDD_PATH, NEW_PATH, 150)
+        preproceso_n.main()
+
+    print("Proceso completado.")
 
 
     

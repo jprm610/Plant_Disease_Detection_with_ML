@@ -41,10 +41,11 @@ if __name__ == "__main__" :
 
     os.chdir(ROOT_PATH)  # Cambia el directorio de trabajo al directorio raíz del proyecto
 
-    # DATA AUGMENTATION
-    if AUGMENT_DATA:
-        data_augmentation = DataAugmentation(SOURCE_PATH, FINAL_PATH)
-        data_augmentation.main()
+# PREPROCESO
+if PREPROCESO:
+    preproceso_n = Preproceso(NEDD_PATH, NEW_PATH
+                              )
+    preproceso_n.main()
 
     # PREPROCESO
     if PREPROCESO:

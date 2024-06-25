@@ -4,10 +4,9 @@ import numpy as np
 from rembg import remove
 
 class Preproceso:
-    def __init__(self, source_folder, target_folder, threshold=155):
+    def __init__(self, source_folder, target_folder):
         self.source_folder = source_folder
         self.target_folder = target_folder
-        self.threshold = threshold
 
     def main(self):
         if not os.path.exists(self.source_folder):
@@ -35,29 +34,17 @@ class Preproceso:
             # Aplicar un filtro gaussiano para suavizar la imagen
             blurred_image = image_no_bg.filter(ImageFilter.GaussianBlur(radius=5))  # Puedes ajustar el radio según sea necesario
 
-            # Convertir a YUV y extraer el canal v (Cb)
-            yuv_image = blurred_image.convert('YCbCr')
-            yuv_array = np.array(yuv_image)
-            y_channel = yuv_array[:, :, 0]
-            cb_channel = yuv_array[:, :, 1]
-            cr_channel = yuv_array[:, :, 2]
+            # Convertir la imagen a modo RGB si tiene un canal alfa
+            if blurred_image.mode == 'RGBA':
+                blurred_image = blurred_image.convert('RGB')
 
-            # Aplicar umbralización en el canal U (Cb)
-            processed_cb_channel = 255 * (cb_channel > self.threshold).astype(np.uint8)
-
-            # Combinar los canales Y, Cb procesado, y Cr
-            processed_yuv_array = np.stack((y_channel, processed_cb_channel, cr_channel), axis=-1)
-            processed_yuv_image = Image.fromarray(processed_yuv_array, 'YCbCr')
-
-            # Convertir de YUV de vuelta a RGB
-            processed_rgb_image = processed_yuv_image.convert('RGB')
-
-            # Guardar la imagen resultante
+            # Guardar la imagen resultante como JPEG
             save_path = os.path.join(self.target_folder, filename)
-            processed_rgb_image.save(save_path)
+            blurred_image.save(save_path, 'JPEG')
             print(f"Imagen guardada en {save_path}")
 
         except Exception as e:
             print(f"Error al procesar la imagen {filename}: {e}")
+
 
 

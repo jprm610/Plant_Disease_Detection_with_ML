@@ -13,7 +13,7 @@ class Download :
         self.labels = labels
 
     def main(self) -> None :
-        print("Downloading images!")
+        print("Downloading images...")
         # Crate an empty dataframe in order to save each image and it's label.
         df = pd.DataFrame(columns=['image_id', 'label'])
 
@@ -25,8 +25,9 @@ class Download :
             df = self.buildDataframe(df=df, destination=destination, label=label)
             print("\tComplete!")
         
-        print("Download complete!")
+        df = df.reset_index()
         df.to_csv(f"{self.destination.parent}/df.csv")
+        print("Download complete!")
 
     def download(self, target_folder: Path, destination: Path) -> None :
         """

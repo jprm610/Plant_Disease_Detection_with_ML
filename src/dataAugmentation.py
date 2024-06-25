@@ -1,88 +1,65 @@
 import numpy as np
 import pandas as pd
+from uuid import uuid4
+from parameters import Parameters
 from pathlib import Path
 from random import seed, choice
 from PIL import Image, ImageEnhance, ImageOps
 
 class DataAugmentation :
-    def __init__(self, source_path: Path, final_path: Path) -> None:
-        self.df = pd.read_csv(source_path / Path("train.csv"))
+    def __init__(self, source_path: Path, goal_amount_per_label=0) -> None:
         self.source_path = source_path
-        self.final_path = final_path
-        self.target_size = (2048, 1365)
+        self.goal_amount_per_label = goal_amount_per_label
+        self.df = pd.read_csv(f"{self.source_path.parent}/df.csv")
 
     def main(self) :
-        self.df = self.Copy_Images(self.source_path, self.final_path)
-
-        separated_dfs = {
-            "healthy" : self.df[self.df.healthy == 1],
-            "multiple_diseases" : self.df[self.df.multiple_diseases == 1],
-            "rust" : self.df[self.df.rust == 1],
-            "scab" : self.df[self.df.scab == 1]
+        print("Augmenting images...")
+        amount_per_label = {
+            label: len(self.df[self.df['label'] == label]) for label in Parameters.DOWNLOAD["PARAMETERS"]['labels']
         }
 
-        goal_amount = max([len(df) for df in separated_dfs.values()])
+        # In case that the user doesn't specify a goal amount or it is less than the maximum, 
+        # all labels will be balanced to the most populated one.
+        if self.goal_amount_per_label < max(amount_per_label.values()) :
+            self.goal_amount_per_label = max(amount_per_label.values())
 
-        last_index = len(self.df)
-        for col in self.df.columns[1:] :
-            iterations = goal_amount - len(separated_dfs[col])
-            while iterations > 0 :
-                seed(iterations)
-                img_id = choice(list(separated_dfs[col]['image_id']))
-                with Image.open(f"{self.final_path}/images/{img_id}.jpg") as img :
+        rows = []
+        for label in Parameters.DOWNLOAD["PARAMETERS"]['labels'] :
+            print(f"\tAugmenting for {label}...")
+            while amount_per_label[label] < self.goal_amount_per_label :
+                seed(self.goal_amount_per_label)
+                source_img_id = choice(list(self.df['image_id'][self.df['label'] == label]))
+                with Image.open(f"{self.source_path}/{source_img_id}") as img :
                     new_img = self.random_transformation(img)
-                    new_img = new_img.resize(self.target_size)
-                    new_img_id = f"img_{last_index}"
-                    new_img_path = f"{self.final_path}/images/{new_img_id}.jpg"
+                    new_img_id = f"{uuid4()}.JPG"
+                    new_img_path = f"{self.source_path}/{new_img_id}"
                     new_img.save(new_img_path)
 
-                row = {'image_id': new_img_id, 'healthy': 0, 'multiple_diseases': 0, 'rust': 0, 'scab': 0}
-                row[col] = 1
-                
-                new_row_df = pd.DataFrame([row])
+                row = {'image_id' : new_img_id, 'label': label}
+                rows.append(row)
 
-                # Use concat to add the new row to the DataFrame
-                self.df = pd.concat([self.df, new_row_df], ignore_index=True)
-
-                last_index += 1
-                iterations -= 1
-
-        self.df.to_csv(f"{self.final_path}/df.csv")
-        print("Data augmentation done!")
+                amount_per_label[label] += 1
+            print("\tComplete!")
+        
+        df_to_append = pd.DataFrame(rows)
+        self.df = pd.concat([self.df, df_to_append], ignore_index=True)
+        self.df = self.df.reset_index()
+        self.df.to_csv(f"{self.source_path.parent}/df.csv")
+        print("Data augmentation complete!")
         return
-    
-    def Copy_Images(self, sourcePath: Path, finalPath: Path) :
-        """
-        Only copy train images, which are already labeled, in the new folder,
-        and change base dataframe.
-        """
-
-        new_df = self.df.copy()
-        for i in range(len(self.df)) :
-            new_df.loc[i, 'image_id'] = f"img_{i}"
-            with Image.open(f"{sourcePath}/images/Train_{i}.jpg") as img :
-                if img.size != self.target_size :
-                    img = img.rotate(90)
-                img.save(f"{finalPath}/images/img_{i}.jpg")
-
-        new_df.to_csv(f"{finalPath}/df.csv")
-        print("\tCopied base images!")
-        return new_df
     
     def random_transformation(self, image: Image) -> Image :
         import random
         """Apply a single random transformation to an image."""
         transformations = [
-            ImageOps.mirror,                                          # Horizontal Flip
+            ImageOps.mirror,  # Horizontal Flip
             lambda x: ImageEnhance.Contrast(x).enhance(random.uniform(0.5, 1.5)),  # Contrast Adjustment
-            lambda x: x.resize((int(x.width * random.uniform(0.7, 1.3)), int(x.height * random.uniform(0.7, 1.3)))),  # Scaling
-            ImageOps.flip,                                            # Vertical Flip
             lambda x: ImageEnhance.Brightness(x).enhance(random.uniform(0.5, 1.5)),  # Brightness Adjustment
             lambda x: ImageEnhance.Color(x).enhance(random.uniform(0.5, 1.5)),  # Color Jitter
             lambda x: ImageEnhance.Sharpness(x).enhance(random.uniform(0.5, 2.0)),  # Sharpness Enhancement
-            lambda x: self.add_gaussian_noise(x),                          # Gaussian Noise
-            lambda x: self.crop_and_resize(x)                              # Crop and Resize
+            self.add_gaussian_noise  # Gaussian Noise
         ]
+
         # Apply a single random transformation
         transformation = random.choice(transformations)
         return transformation(image)
@@ -98,15 +75,4 @@ class DataAugmentation :
         gauss = gauss.reshape(row, col, ch).astype('uint8')
         noisy = np_image + gauss
         return Image.fromarray(np.clip(noisy, 0, 255).astype('uint8'))
-
-    def crop_and_resize(self, image):
-        import random
-        """Crop the image randomly and resize it back to original dimensions."""
-        original_size = image.size
-        left = random.randint(0, original_size[0] // 4)
-        top = random.randint(0, original_size[1] // 4)
-        right = random.randint(3 * original_size[0] // 4, original_size[0])
-        bottom = random.randint(3 * original_size[1] // 4, original_size[1])
-        image = image.crop((left, top, right, bottom))
-        return image.resize(original_size)
     

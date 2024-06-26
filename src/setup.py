@@ -13,7 +13,7 @@ class Setup :
             os.makedirs(main_dir, exist_ok=True)
             
             # Create subdirectories
-            subdirectories = ["data/images", "preprocesamiento"]
+            subdirectories = ["data/images", "preprocesamiento", "model"]
             for subdir in subdirectories:
                 os.makedirs(os.path.join(main_dir, subdir), exist_ok=True)
         except :

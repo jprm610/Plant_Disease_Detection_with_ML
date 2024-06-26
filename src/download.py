@@ -22,7 +22,7 @@ class Download :
             target_folder = self.target_folder / f"Apple___{label}"
             destination = self.destination / label
             self.download(target_folder, destination)
-            df = self.buildDataframe(df=df, destination=destination, label=label)
+            df = self.build_dataframe(df=df, destination=destination, label=label)
             print("\tComplete!")
         
         df = df.reset_index()
@@ -36,7 +36,7 @@ class Download :
         fs = fsspec.filesystem("github", org=self.github_user, repo=self.github_repo)
         fs.get(fs.ls(target_folder.as_posix()), destination.as_posix())
 
-    def buildDataframe(self, df: pd.DataFrame, destination: Path, label: Path) -> pd.DataFrame :
+    def build_dataframe(self, df: pd.DataFrame, destination: Path, label: Path) -> pd.DataFrame :
         """
         Build the dataframe from the downloaded images.
         """

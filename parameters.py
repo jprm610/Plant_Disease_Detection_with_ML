@@ -17,9 +17,19 @@ class Parameters :
     }
 
     DATA_AUGMENTATION = {
-        "EXECUTE": True,
+        "EXECUTE": False,
         "PARAMETERS": {
             "source_path": DOWNLOAD["PARAMETERS"]["destination"],
             "goal_amount_per_label": 0
+        }
+    }
+
+    DEEP_LEARNING = {
+        "EXECUTE": True,
+        "PARAMETERS": {
+            "source_path": DOWNLOAD["PARAMETERS"]["destination"],
+            "export_path": Path("artifacts/model"),
+            "epochs": 100,
+            "early_stopping": 5
         }
     }

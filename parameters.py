@@ -30,6 +30,6 @@ class Parameters :
             "source_path": DOWNLOAD["PARAMETERS"]["destination"],
             "export_path": Path("artifacts/model"),
             "epochs": 100,
-            "early_stopping": 5
+            "early_stopping": 3
         }
     }

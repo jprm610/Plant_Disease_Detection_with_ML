@@ -24,3 +24,7 @@ if __name__ == "__main__" :
     if Parameters.DEEP_LEARNING["EXECUTE"] :
         deepLearning = DeepLearning(**Parameters.DEEP_LEARNING["PARAMETERS"])
         deepLearning.main()
+
+
+
+

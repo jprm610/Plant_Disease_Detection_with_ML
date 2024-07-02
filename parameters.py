@@ -6,7 +6,7 @@ class Parameters :
     FIRST_RUN = False
 
     DOWNLOAD = {
-        "EXECUTE": False,
+        "EXECUTE": True,
         "PARAMETERS": {
             "github_user": "spMohanty",
             "github_repo": "PlantVillage-Dataset",
@@ -17,7 +17,7 @@ class Parameters :
     }
 
     DATA_AUGMENTATION = {
-        "EXECUTE": False,
+        "EXECUTE": True,
         "PARAMETERS": {
             "source_path": DOWNLOAD["PARAMETERS"]["destination"],
             "goal_amount_per_label": 0
@@ -25,7 +25,7 @@ class Parameters :
     }
 
     DEEP_LEARNING = {
-        "EXECUTE": True,
+        "EXECUTE": False,
         "PARAMETERS": {
             "source_path": DOWNLOAD["PARAMETERS"]["destination"],
             "export_path": Path("artifacts/model"),

@@ -18,7 +18,7 @@ class DeepLearning:
         train_df, val_df = self.split_df()
         train_generator, val_generator = self.create_image_data_generators(train_df, val_df)
         print("\tImage generators created!")
-        model, earlyStopping = self.define_model(self.early_stopping)
+        model, earlyStopping, reduce_lr = self.define_model(self.early_stopping)
 
         print("\tFitting model...")
         steps_per_epoch = max(1, train_generator.samples // train_generator.batch_size)
@@ -30,7 +30,7 @@ class DeepLearning:
             epochs=self.epochs,
             validation_data=val_generator,
             validation_steps=validation_steps,
-            callbacks=[earlyStopping]
+            callbacks=[earlyStopping, reduce_lr]
         )
 
         print("\tModel fitted successfully!")
@@ -74,7 +74,8 @@ class DeepLearning:
             y_col='label',
             target_size=(224, 224),
             batch_size=32,
-            class_mode='categorical'
+            class_mode='categorical',
+            shuffle=False
         )
 
         return train_generator, val_generator
@@ -82,9 +83,10 @@ class DeepLearning:
     def define_model(self, early_stopping):
         from tensorflow.keras.models import Sequential
         from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
-        from tensorflow.keras.callbacks import EarlyStopping
+        from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
         from tensorflow.keras.optimizers import Adam
         from tensorflow.keras.regularizers import l2
+        from tensorflow.keras.layers import BatchNormalization
 
         earlyStopping = EarlyStopping(
             monitor="val_loss",
@@ -94,33 +96,50 @@ class DeepLearning:
             mode="auto",
             baseline=None,
             restore_best_weights=True,
-            start_from_epoch=0,
+            start_from_epoch=10,
         )
-        
+
+        reduce_lr = ReduceLROnPlateau(
+            monitor='val_loss',
+            factor=0.2,
+            patience=3,
+            min_lr=0.00001
+        )
+
         model = Sequential([
-            Conv2D(16, (3, 3), activation='relu', input_shape=(224, 224, 3)),
-            MaxPooling2D((2, 2)),
-            Conv2D(32, (3, 3), activation='relu'),
-            MaxPooling2D((2, 2)),
-            Conv2D(64, (3, 3), activation='relu'),
-            MaxPooling2D((2, 2)),
-            Conv2D(128, (3, 3), activation='relu'),
-            MaxPooling2D((2, 2)),
-            Conv2D(256, (3, 3), activation='relu'),
-            MaxPooling2D((2, 2)),
-            Flatten(),
-            Dense(512, activation='relu', kernel_regularizer=l2(0.001)),
-            Dropout(0.5),
-            Dense(4, activation='softmax')  # 4 classes
-        ])
+    Conv2D(16, (3, 3), activation='relu', input_shape=(224, 224, 3)),
+    MaxPooling2D((2, 2)),
+    
+    Conv2D(32, (3, 3), activation='relu'),
+    MaxPooling2D((2, 2)),
+    
+    Conv2D(64, (3, 3), activation='relu'),
+    MaxPooling2D((2, 2)),
+    
+    Conv2D(128, (3, 3), activation='relu'),
+    MaxPooling2D((2, 2)),
+    
+    Conv2D(256, (3, 3), activation='relu'),
+    MaxPooling2D((2, 2)),
+    
+    Conv2D(512, (3, 3), activation='relu'),
+    MaxPooling2D((2, 2)),
+    
+    Flatten(),
+    
+    Dense(1024, activation='relu', kernel_regularizer=l2(0.001)),
+    Dropout(0.3),
+    
+    Dense(4, activation='softmax')  # 4 clases
+])
 
         model.compile(
             optimizer=Adam(learning_rate=0.0001),
             loss='categorical_crossentropy',
             metrics=['accuracy'],
         )
-        
-        return model, earlyStopping
+
+        return model, earlyStopping, reduce_lr
 
     def output_and_export_results(self, model, train_generator, val_generator):
         val_loss, val_acc = model.evaluate(val_generator, verbose=2)

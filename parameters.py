@@ -25,11 +25,11 @@ class Parameters :
     }
 
     DEEP_LEARNING = {
-        "EXECUTE": False,
+        "EXECUTE": True,
         "PARAMETERS": {
             "source_path": DOWNLOAD["PARAMETERS"]["destination"],
             "export_path": Path("artifacts/model"),
             "epochs": 100,
-            "early_stopping": 3
+            "early_stopping": 5
         }
     }

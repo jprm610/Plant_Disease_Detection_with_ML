@@ -29,11 +29,10 @@ class AugmentedDatasetEvaluator:
         if not self.csv_path.exists():
             raise FileNotFoundError(f"El archivo CSV no se encuentra en {self.csv_path}")
         
-        # Configurar el generador de datos aumentados
+        # Configurar el generador de datos aumentados con rescale
         self.datagen = ImageDataGenerator(
+            rescale=1.0/255,  # Normalizar al rango [0, 1]
             rotation_range=10,
-            width_shift_range=0.05,
-            height_shift_range=0.05,
             horizontal_flip=True,
             zoom_range=0.05
         )
@@ -43,11 +42,9 @@ class AugmentedDatasetEvaluator:
             print(f"Contenido del CSV:\n{df.head()}")
             print(f"Columnas del CSV: {df.columns}")
             
-            # Verificar que las columnas necesarias existen
             if 'image_id' not in df.columns or 'label' not in df.columns:
                 raise ValueError("El CSV no contiene las columnas 'image_id' y 'label' necesarias")
             
-            # Usar el DataFrame para crear el generador de datos
             self.augmented_dataset = self.datagen.flow_from_dataframe(
                 dataframe=df,
                 directory=self.original_dataset_path,
@@ -71,10 +68,8 @@ class AugmentedDatasetEvaluator:
         if self.augmented_dataset.samples == 0:
             raise ValueError("No se encontraron imágenes en el conjunto de datos")
         
-        # Evaluar el modelo en el conjunto de datos aumentado
         results = self.model.evaluate(self.augmented_dataset, steps=self.augmented_dataset_size // 32)
         
-        # Generar reporte de clasificación
         y_true = []
         y_pred = []
         for _ in range(self.augmented_dataset_size // self.augmented_dataset.batch_size):
@@ -121,3 +116,4 @@ evaluator = AugmentedDatasetEvaluator(
 )
 
 evaluator.run()
+

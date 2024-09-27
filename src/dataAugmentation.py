@@ -43,7 +43,8 @@ class DataAugmentation :
         
         df_to_append = pd.DataFrame(rows)
         self.df = pd.concat([self.df, df_to_append], ignore_index=True)
-        self.df = self.df.reset_index()
+        #self.df = self.df.reset_index()
+        self.df = self.df[['image_id', 'label']]
         self.df.to_csv(f"{self.source_path.parent}/df.csv")
         print("Data augmentation complete!")
         return
@@ -53,11 +54,11 @@ class DataAugmentation :
         """Apply a single random transformation to an image."""
         transformations = [
             ImageOps.mirror,  # Horizontal Flip
-            lambda x: ImageEnhance.Contrast(x).enhance(random.uniform(0.5, 1.5)),  # Contrast Adjustment
-            lambda x: ImageEnhance.Brightness(x).enhance(random.uniform(0.5, 1.5)),  # Brightness Adjustment
-            lambda x: ImageEnhance.Color(x).enhance(random.uniform(0.5, 1.5)),  # Color Jitter
-            lambda x: ImageEnhance.Sharpness(x).enhance(random.uniform(0.5, 2.0)),  # Sharpness Enhancement
-            self.add_gaussian_noise  # Gaussian Noise
+            lambda x: ImageEnhance.Contrast(x).enhance(random.uniform(0.5, 1.5)), # CONTRASTE
+            lambda x: ImageEnhance.Brightness(x).enhance(random.uniform(0.5, 1.5)), # BRIGHTNESS
+            lambda x: ImageEnhance.Color(x).enhance(random.uniform(0.5, 1.5)), # MODIFICACION COLOR
+            lambda x: ImageEnhance.Sharpness(x).enhance(random.uniform(0.5, 2.0)), # NITIDEZ
+            self.add_gaussian_noise # RUIDO GAUSIANO
         ]
 
         # Apply a single random transformation

@@ -3,7 +3,7 @@ from pathlib import Path
 class Parameters :
     ROOT_PATH = Path().absolute()
 
-    FIRST_RUN = False
+    FIRST_RUN = True
 
     DOWNLOAD = {
         "EXECUTE": True,

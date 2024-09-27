@@ -107,31 +107,31 @@ class DeepLearning:
         )
 
         model = Sequential([
-    Conv2D(16, (3, 3), activation='relu', input_shape=(224, 224, 3)),
-    MaxPooling2D((2, 2)),
-    
-    Conv2D(32, (3, 3), activation='relu'),
-    MaxPooling2D((2, 2)),
-    
-    Conv2D(64, (3, 3), activation='relu'),
-    MaxPooling2D((2, 2)),
-    
-    Conv2D(128, (3, 3), activation='relu'),
-    MaxPooling2D((2, 2)),
-    
-    Conv2D(256, (3, 3), activation='relu'),
-    MaxPooling2D((2, 2)),
-    
-    Conv2D(512, (3, 3), activation='relu'),
-    MaxPooling2D((2, 2)),
-    
-    Flatten(),
-    
-    Dense(1024, activation='relu', kernel_regularizer=l2(0.001)),
-    Dropout(0.3),
-    
-    Dense(4, activation='softmax')  # 4 clases
-])
+            Conv2D(16, (3, 3), activation='relu', input_shape=(224, 224, 3)),
+            MaxPooling2D((2, 2)),
+            
+            Conv2D(32, (3, 3), activation='relu'),
+            MaxPooling2D((2, 2)),
+            
+            Conv2D(64, (3, 3), activation='relu'),
+            MaxPooling2D((2, 2)),
+            
+            Conv2D(128, (3, 3), activation='relu'),
+            MaxPooling2D((2, 2)),
+            
+            Conv2D(256, (3, 3), activation='relu'),
+            MaxPooling2D((2, 2)),
+            
+            Conv2D(512, (3, 3), activation='relu'),
+            MaxPooling2D((2, 2)),
+            
+            Flatten(),
+            
+            Dense(1024, activation='relu', kernel_regularizer=l2(0.001)),
+            Dropout(0.3),
+            
+            Dense(4, activation='softmax')  # 4 clases
+        ])
 
         model.compile(
             optimizer=Adam(learning_rate=0.0001),

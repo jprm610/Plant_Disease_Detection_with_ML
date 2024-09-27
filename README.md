@@ -6,14 +6,14 @@ Este proyecto desarrolla y despliega un modelo de red neuronal convolucional (CN
 
 ## Instalación
 - Clonar el repositorio:
-    git clone https://github.com/jprm610/Plant_Disease_Detection_with_ML.git
+    `git clone https://github.com/jprm610/Plant_Disease_Detection_with_ML.git`
 
 ## Descripción general del directorio
-- research: Contiene los jupyter notebooks en los cuales se realizaron pruebas antes de escribir el código en forma modular.
-- src: Este el modulo principal del proyecto en donde se encuntran las clases y métodos usados en todo el proceso.
-- artifacts: Esta carpeta no existe aún en el repositorio ya que se creará dinámicamente. Aquí se descargarán las imágenes y se exportará el modelo y sus resultados.
-- parameters.py: Archivo que contiene todos los hiperparámetros modificables en el modelo.
-- main.py: El archivo principal desde el cual se ejecuta el proyecto de acuerdo a los parámetros definidos en parameters.py
+- `research`: Contiene los jupyter notebooks en los cuales se realizaron pruebas antes de escribir el código en forma modular.
+- `src`: Este el modulo principal del proyecto en donde se encuntran las clases y métodos usados en todo el proceso.
+- `artifacts`: Esta carpeta no existe aún en el repositorio ya que se creará dinámicamente. Aquí se descargarán las imágenes y se exportará el modelo y sus resultados.
+- `parameters.py`: Archivo que contiene todos los hiperparámetros modificables en el modelo.
+- `main.py`: El archivo principal desde el cual se ejecuta el proyecto de acuerdo a los parámetros definidos en parameters.py
 
 ## Configuración
 
@@ -29,13 +29,13 @@ El archivo `parameters.py` contiene las configuraciones necesarias para personal
 ### Entrenamiento del Modelo
 - `DEEP_LEARNING`: Configura el entrenamiento del modelo con parámetros como la ruta de las imágenes, ruta de exportación del modelo, número de épocas y configuración de early stopping.
 
-Solo se recomienda modificar los parámetros FIRST_RUN y EXECUTE en cada fase, los cuales funcionan simplemente como switches que permiten ejecutar una fase del proyecto.
+Solo se recomienda modificar los parámetros `FIRST_RUN` y `EXECUTE` en cada fase, los cuales funcionan simplemente como switches que permiten ejecutar una fase del proyecto.
 
 ## Uso
 
 Para iniciar el proceso de entrenamiento y evaluación del modelo, asegúrate de que el archivo `parameters.py` esté configurado correctamente y ejecuta:
 
-python main.py
+`python main.py`
 
 ## Tecnologías Utilizadas
 - Python
